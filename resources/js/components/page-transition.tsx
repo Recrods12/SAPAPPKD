@@ -1,0 +1,1 @@
+import type {ReactNode} from 'react'; import {motion} from 'motion/react'; import {fadeUp} from '@/lib/motion'; export function PageTransition({children}:{children:ReactNode}){return <motion.div initial="hidden" animate="visible" variants={fadeUp}>{children}</motion.div>}

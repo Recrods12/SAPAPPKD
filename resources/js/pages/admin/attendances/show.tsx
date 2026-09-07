@@ -1,0 +1,29 @@
+import { Head, Link, router } from '@inertiajs/react';
+import { ArrowLeft, Camera, MapPin } from 'lucide-react';
+import { ReasonDialog } from '@/components/reason-dialog';
+import { Button } from '@/components/ui/button';
+import { AdminLayout } from '@/layouts/admin-layout';
+
+interface AttendanceDetail {
+    id: number; attendance_date: string; type: string; status: string; recorded_at: string; latitude: string; longitude: string; distance_meters: string; accuracy_meters: string; ip_address: string | null; user_agent: string | null;
+    user: { name: string; participant_profile?: { participant_number: string } | null };
+    attendance_location: { name: string };
+    photo?: { id: number } | null;
+    fraud_flags: { id: number; reason: string; status: string }[];
+    corrections: { id: number; reason: string; created_at: string; admin: { name: string } }[];
+}
+
+const statusOptions = [
+    { value: 'on_time', label: 'Tepat waktu' }, { value: 'late', label: 'Terlambat' },
+    { value: 'present', label: 'Pulang sesuai jadwal' }, { value: 'early_leave', label: 'Pulang cepat' },
+    { value: 'needs_verification', label: 'Perlu verifikasi' }, { value: 'void', label: 'Batalkan catatan' },
+];
+
+export default function Show({ attendance }: { attendance: AttendanceDetail }) {
+    function correct(reason: string, status?: string) {
+        if (!status) return;
+        router.patch(route('admin.attendances.update', attendance.id), { status, reason }, { preserveScroll: true });
+    }
+
+    return <AdminLayout title="Detail Kehadiran"><Head title="Detail Kehadiran"/><Button asChild variant="ghost"><Link href={route('admin.attendances.index')}><ArrowLeft/>Kembali</Link></Button><div className="mt-4 grid gap-5 lg:grid-cols-2"><section className="rounded-2xl border bg-white p-5"><h1 className="text-xl font-bold">{attendance.user.name}</h1><p>{attendance.user.participant_profile?.participant_number}</p><dl className="mt-5 grid grid-cols-2 gap-4 text-sm"><div><dt className="text-muted-foreground">Jadwal</dt><dd>{attendance.attendance_date} · {attendance.type}</dd></div><div><dt className="text-muted-foreground">Status</dt><dd>{attendance.status}</dd></div><div><dt className="text-muted-foreground">Waktu server</dt><dd>{new Date(attendance.recorded_at).toLocaleString('id-ID')}</dd></div><div><dt className="text-muted-foreground">Lokasi</dt><dd>{attendance.attendance_location.name}</dd></div><div><dt className="text-muted-foreground">Koordinat</dt><dd>{attendance.latitude}, {attendance.longitude}</dd></div><div><dt className="text-muted-foreground">Jarak / akurasi</dt><dd>{attendance.distance_meters} m / ±{attendance.accuracy_meters} m</dd></div><div><dt className="text-muted-foreground">IP</dt><dd>{attendance.ip_address || '-'}</dd></div><div><dt className="text-muted-foreground">Perangkat</dt><dd className="break-all">{attendance.user_agent || '-'}</dd></div></dl><div className="mt-5 flex flex-wrap gap-2">{attendance.photo && <Button asChild variant="outline"><a href={route('attendance-photos.show', attendance.photo.id)} target="_blank" rel="noreferrer"><Camera/>Foto</a></Button>}<ReasonDialog trigger={<Button>Koreksi</Button>} title="Koreksi catatan absensi" description="Setiap perubahan menyimpan nilai sebelum dan sesudah, administrator, waktu, serta alasan." optionLabel="Status baru" options={statusOptions} initialOption={attendance.status} label="Alasan koreksi" confirmLabel="Simpan koreksi" onConfirm={correct}/><Button asChild variant="outline"><a href={`https://www.openstreetmap.org/?mlat=${attendance.latitude}&mlon=${attendance.longitude}#map=19/${attendance.latitude}/${attendance.longitude}`} target="_blank" rel="noreferrer"><MapPin/>Peta</a></Button></div></section><section className="rounded-2xl border bg-white p-5"><h2 className="font-bold">Audit dan fraud flag</h2>{attendance.fraud_flags.map((flag) => <div key={flag.id} className="mt-3 rounded-lg bg-red-50 p-3 text-sm">{flag.reason} · {flag.status}</div>)}{attendance.fraud_flags.length === 0 && <p className="mt-3 text-sm text-muted-foreground">Tidak ada fraud flag.</p>}<h3 className="mt-6 font-semibold">Riwayat koreksi</h3>{attendance.corrections.map((correction) => <div key={correction.id} className="mt-3 border-l-2 pl-3 text-sm"><strong>{correction.admin.name}</strong><p>{correction.reason}</p><small>{new Date(correction.created_at).toLocaleString('id-ID')}</small></div>)}{attendance.corrections.length === 0 && <p className="mt-3 text-sm text-muted-foreground">Belum pernah dikoreksi.</p>}</section></div></AdminLayout>;
+}

@@ -1,0 +1,27 @@
+<?php
+
+namespace App\Http\Requests\Admin;
+
+use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Foundation\Http\FormRequest;
+
+class CorrectAttendanceRequest extends FormRequest
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(): bool
+    {
+        return $this->user()?->hasAnyRole(['super-admin', 'admin-ppkd']) === true;
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, ValidationRule|array<mixed>|string>
+     */
+    public function rules(): array
+    {
+        return ['status' => ['required', 'in:on_time,late,present,early_leave,outside_schedule,needs_verification,void'], 'reason' => ['required', 'string', 'min:10', 'max:2000']];
+    }
+}

@@ -1,0 +1,20 @@
+{
+  "name": "absenonline",
+  "version": "1.0.0",
+  "description": "Sistem absensi online peserta pelatihan PPKD Jakarta Barat",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "test": "node --test"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "UNLICENSED",
+  "type": "commonjs",
+  "dependencies": {
+    "express": "^5.2.1",
+    "express-session": "^1.19.0",
+    "multer": "^2.3.0"
+  }
+}

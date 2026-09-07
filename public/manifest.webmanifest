@@ -1,0 +1,21 @@
+{
+  "name": "SAPA PPKD Jakarta Barat",
+  "short_name": "SAPA PPKD",
+  "description": "Sistem absensi peserta pelatihan PPKD Jakarta Barat",
+  "start_url": "/",
+  "id": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "lang": "id-ID",
+  "categories": ["education", "productivity"],
+  "background_color": "#f8fafc",
+  "theme_color": "#1d4ed8",
+  "icons": [
+    { "src": "/icons/sapa-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/icons/sapa-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Absen Hari Ini", "short_name": "Absen", "url": "/attendance", "icons": [{ "src": "/icons/sapa-192.png", "sizes": "192x192", "type": "image/png" }] }
+  ]
+}
