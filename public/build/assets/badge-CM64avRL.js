@@ -1,0 +1,1 @@
+import{n as e}from"./createLucideIcon-Cxpueh9Q.js";import{n as t}from"./button-DKLX3Aw6.js";var n=e();function r({className:e,...r}){return(0,n.jsx)(`span`,{className:t(`inline-flex items-center rounded-full bg-secondary px-2.5 py-1 text-xs font-semibold text-secondary-foreground`,e),...r})}export{r as t};
