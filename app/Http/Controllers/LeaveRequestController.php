@@ -37,7 +37,8 @@ class LeaveRequestController extends Controller
 
     public function document(Request $request, LeaveRequest $leaveRequest): StreamedResponse
     {
-        $authorized = $request->user()->id === $leaveRequest->user_id || $request->user()->hasAnyRole(['super-admin', 'admin-ppkd']);
+        $assignedInstructor = $request->user()->hasRole('instructor') && $request->user()->instructedClasses()->whereHas('enrollments', fn ($query) => $query->where('user_id', $leaveRequest->user_id)->where('status', 'active'))->exists();
+        $authorized = $request->user()->id === $leaveRequest->user_id || $request->user()->hasAnyRole(['super-admin', 'admin-ppkd']) || $assignedInstructor;
         abort_unless($authorized, 403);
         abort_unless($leaveRequest->document_path && Storage::disk('local')->exists($leaveRequest->document_path), 404);
 

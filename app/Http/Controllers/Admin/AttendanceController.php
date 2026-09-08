@@ -30,7 +30,7 @@ class AttendanceController extends Controller
 
     public function show(Attendance $attendance): Response
     {
-        return Inertia::render('admin/attendances/show', ['attendance' => $attendance->load(['user.participantProfile', 'trainingSchedule.trainingClass.trainingBatch.trainingProgram', 'attendanceLocation', 'photo', 'corrections.admin:id,name', 'fraudFlags'])]);
+        return Inertia::render('admin/attendances/show', ['attendance' => $attendance->load(['user.participantProfile', 'trainingSchedule.trainingClass.trainingBatch.trainingProgram', 'attendanceLocation', 'photo', 'corrections.admin:id,name', 'fraudFlags', 'instructorCorrectionRequests.instructor:id,name'])]);
     }
 
     public function update(CorrectAttendanceRequest $request, Attendance $attendance): RedirectResponse
@@ -40,6 +40,9 @@ class AttendanceController extends Controller
             $before = $attendance->only(['status', 'voided_at', 'needs_review']);
             $attendance->update(['status' => $request->validated('status') === 'void' ? $attendance->status : $request->validated('status'), 'voided_at' => $request->validated('status') === 'void' ? now() : null, 'needs_review' => false]);
             $after = $attendance->fresh()->only(['status', 'voided_at', 'needs_review']);
+            $attendance->instructorCorrectionRequests()->where('status', 'pending')->get()->each(function ($correctionRequest) use ($request): void {
+                $correctionRequest->update(['status' => $correctionRequest->requested_status === $request->validated('status') ? 'approved' : 'rejected', 'admin_notes' => $request->validated('reason'), 'processed_by' => $request->user()->id, 'processed_at' => now()]);
+            });
             AttendanceCorrection::query()->create(['attendance_id' => $attendance->id, 'admin_id' => $request->user()->id, 'before_data' => $before, 'after_data' => $after, 'reason' => $request->validated('reason')]);
             FraudFlag::query()->create(['attendance_id' => $attendance->id, 'user_id' => $attendance->user_id, 'reason' => 'admin_correction', 'severity' => 'info', 'metadata' => ['reason' => $request->validated('reason')], 'status' => 'reviewed', 'reviewed_by' => $request->user()->id, 'reviewed_at' => now(), 'review_notes' => $request->validated('reason')]);
             ActivityLog::query()->create(['user_id' => $request->user()->id, 'event' => 'attendance.corrected', 'subject_type' => Attendance::class, 'subject_id' => $attendance->id, 'properties' => ['before' => $before, 'after' => $after, 'reason' => $request->validated('reason')], 'ip_address' => $request->ip(), 'user_agent' => $request->userAgent()]);

@@ -30,8 +30,13 @@ use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\BrandLogoController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Instructor\AttendanceController as InstructorAttendanceController;
+use App\Http\Controllers\Instructor\AttendanceCorrectionController as InstructorAttendanceCorrectionController;
 use App\Http\Controllers\Instructor\ClassController as InstructorClassController;
 use App\Http\Controllers\Instructor\DashboardController as InstructorDashboardController;
+use App\Http\Controllers\Instructor\LeaveRequestController as InstructorLeaveRequestController;
+use App\Http\Controllers\Instructor\ProfileController as InstructorProfileController;
+use App\Http\Controllers\Instructor\ReportController as InstructorReportController;
 use App\Http\Controllers\LeaveRequestController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ParticipantScheduleController;
@@ -80,6 +85,15 @@ Route::middleware(['auth', 'active'])->group(function (): void {
     Route::prefix('instructor')->name('instructor.')->middleware('role:instructor')->group(function (): void {
         Route::get('/', InstructorDashboardController::class)->name('dashboard');
         Route::get('classes/{trainingClass}', [InstructorClassController::class, 'show'])->name('classes.show');
+        Route::get('attendances', [InstructorAttendanceController::class, 'index'])->name('attendances.index');
+        Route::get('attendances/{attendance}', [InstructorAttendanceController::class, 'show'])->name('attendances.show');
+        Route::post('attendances/{attendance}/correction-requests', [InstructorAttendanceCorrectionController::class, 'store'])->name('attendance-corrections.store');
+        Route::get('leave-requests', [InstructorLeaveRequestController::class, 'index'])->name('leave-requests.index');
+        Route::get('reports', [InstructorReportController::class, 'index'])->name('reports.index');
+        Route::get('reports/excel', [InstructorReportController::class, 'excel'])->name('reports.excel');
+        Route::get('reports/pdf', [InstructorReportController::class, 'pdf'])->name('reports.pdf');
+        Route::get('profile', [InstructorProfileController::class, 'edit'])->name('profile.edit');
+        Route::put('profile', [InstructorProfileController::class, 'update'])->name('profile.update');
     });
     Route::prefix('admin')->name('admin.')->middleware('role:super-admin|admin-ppkd')->group(function (): void {
         Route::get('/', AdminDashboardController::class)->name('dashboard');

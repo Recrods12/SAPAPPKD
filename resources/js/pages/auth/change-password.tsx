@@ -1,9 +1,12 @@
-import { Head, Link, useForm } from "@inertiajs/react";
+import { Head, Link, useForm, usePage } from "@inertiajs/react";
 import { ArrowLeft, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import type { SharedProps } from "@/types";
 export default function ChangePassword() {
+    const { auth } = usePage<SharedProps>().props;
+    const backRoute = auth.user?.roles.includes("instructor") ? "instructor.profile.edit" : "dashboard";
     const form = useForm({
         current_password: "",
         password: "",
@@ -29,7 +32,7 @@ export default function ChangePassword() {
             <Card className="mx-auto max-w-xl">
                 <CardContent>
                     <Button asChild variant="ghost">
-                        <Link href={route("dashboard")}>
+                        <Link href={route(backRoute)}>
                             <ArrowLeft />
                             Kembali
                         </Link>
