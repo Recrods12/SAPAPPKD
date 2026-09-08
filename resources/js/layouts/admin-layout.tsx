@@ -160,11 +160,11 @@ export function AdminLayout({
                         </div>
                         <Button
                             variant="outline"
-                            size="icon"
                             aria-label="Keluar"
                             onClick={() => router.post(route("logout"))}
                         >
                             <LogOut className="size-4" />
+                            <span>Keluar</span>
                         </Button>
                     </div>
                 </header>
