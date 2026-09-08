@@ -60,7 +60,7 @@ function Navigation() {
     const isSuperAdmin = auth.user?.roles.includes("super-admin");
     const visibleItems = items.filter(([, , , permission]) => isSuperAdmin || permission === null || auth.user?.permissions.includes(permission));
     return (
-        <nav className="grid gap-1 p-4">
+        <nav className="grid min-h-0 flex-1 content-start gap-1 overflow-y-auto overscroll-contain p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
             {visibleItems.map(([label, name, Icon]) => (
                 <Link
                     key={name}
@@ -85,7 +85,7 @@ export function AdminLayout({
     const { auth } = usePage<SharedProps>().props;
     return (
         <div className="min-h-screen lg:grid lg:grid-cols-[260px_1fr]">
-            <aside className="fixed inset-y-0 hidden w-[260px] bg-slate-950 lg:block">
+            <aside className="fixed inset-y-0 hidden h-dvh w-[260px] flex-col overflow-hidden bg-slate-950 lg:flex">
                 <div className="border-b border-white/10 p-5">
                     <Brand inverse />
                 </div>
@@ -103,7 +103,7 @@ export function AdminLayout({
                             onClick={() => setOpen(false)}
                         />
                         <motion.aside
-                            className="fixed inset-y-0 left-0 z-50 w-[280px] bg-slate-950 lg:hidden"
+                            className="fixed inset-y-0 left-0 z-50 flex h-dvh w-[280px] flex-col overflow-hidden bg-slate-950 lg:hidden"
                             variants={slideSidebar}
                             initial="hidden"
                             animate="visible"
